@@ -10,6 +10,7 @@ gem 'ed25519'
 gem "sprockets-rails"
 
 group :test do
+  gem "rspec-rails"
   gem "timecop"
 end
 
