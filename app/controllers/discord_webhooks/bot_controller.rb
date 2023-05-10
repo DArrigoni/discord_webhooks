@@ -54,8 +54,8 @@ module DiscordWebhooks
     end
 
     def command_params
-      params.require(:bot).permit!.tap do |params|
-        Rails.logger.debug(params.to_h) if Rails.env.development?
+      params.require(:bot).permit!.to_h.with_indifferent_access.tap do |params|
+        Rails.logger.debug(params) if Rails.env.development?
       end
     end
 

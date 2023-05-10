@@ -76,7 +76,7 @@ module DiscordWebhooks
     end
 
     def executor
-      command_params['member']
+      command_params[:member]
     end
   end
 end
