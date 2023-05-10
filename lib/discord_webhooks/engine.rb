@@ -1,5 +1,5 @@
 module DiscordWebhooks
-  mattr_accessor :discord_public_key
+  mattr_accessor :discord_public_key, :discord_application_id, :discord_bot_token
 
   class Engine < ::Rails::Engine
     engine_name "discord_webhooks"
@@ -7,8 +7,6 @@ module DiscordWebhooks
 
     config.to_prepare do
       require "ed25519"
-
-      # Dir.glob(Rails.root + "app/bot/**/*.rb")
     end
   end
 end

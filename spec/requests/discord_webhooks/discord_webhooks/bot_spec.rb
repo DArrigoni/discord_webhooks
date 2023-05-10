@@ -54,6 +54,30 @@ RSpec.describe "DiscordWebhooks::Bot", type: :request do
           expect(response.status).to eq(400)
         end
       end
+
+      context 'slash command' do
+        it 'should look up by class name and instantiate it correctly' do
+          params = { "type" => 2, "bot" => { "data" => { "name" => "ping", "type" => 1 }, "type" => 2 } }
+
+          post_request(now, params)
+
+          expect(response).to be_successful
+
+          # NOTE: Matches dummy/bot/ping_command.rb
+          expect(JSON.parse(response.body)).to eq('type' => 4, 'data' => { 'content' => 'Pong!' })
+        end
+
+        it 'should look up by class name with multiple words and kebab case' do
+          params = { "type" => 2, "bot" => { "data" => { "name" => "ping-pong", "type" => 1 }, "type" => 2 } }
+
+          post_request(now, params)
+
+          expect(response).to be_successful
+
+          # NOTE: Matches dummy/bot/ping_pong_command.rb
+          expect(JSON.parse(response.body)).to eq('type' => 4, 'data' => { 'content' => 'Ping pong!' })
+        end
+      end
     end
   end
 end

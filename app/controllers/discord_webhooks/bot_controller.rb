@@ -7,6 +7,14 @@ module DiscordWebhooks
       head :unauthorized
     end
 
+    DISCORD_INTERACTION_TYPE = {
+      PING: 1,
+      APPLICATION_COMMAND: 2,
+      MESSAGE_COMPONENT: 3,
+      APPLICATION_COMMAND_AUTOCOMPLETE: 4,
+      MODAL_SUBMIT: 5
+    }
+
     def bot_info
       info = []
       info << "Requirements loaded: #{Ed25519::VerifyKey.present?}"
@@ -15,7 +23,45 @@ module DiscordWebhooks
     end
 
     def bot_action
-      render json: { 'type' => 1 }
+      type = params.require('type')
+      return render json: { type: 1 } if type == DISCORD_INTERACTION_TYPE[:PING]
+
+      case type
+        when DISCORD_INTERACTION_TYPE[:APPLICATION_COMMAND]
+          run_command
+        # when DISCORD_INTERACTION_TYPE[:MESSAGE_COMPONENT]
+        #   run_message_handler
+        # when DISCORD_INTERACTION_TYPE[:MODAL_SUBMIT]
+        #   run_modal_handler
+        else
+          render_error :unsupported_action_type
+      end
+
+    end
+
+    private
+
+    def run_command
+      # command = BaseCommand.command_for(command_params)
+      command_name = command_params[:data][:name]
+      command_class = "#{command_name}-command".underscore.camelize.constantize
+      raise "Command not found: #{command_name}" if command_class.nil?
+
+      command = command_class.new(command_params)
+      payload = command.run_command
+
+      render json: payload
+    end
+
+    def command_params
+      params.require(:bot).permit!.tap do |params|
+        Rails.logger.debug(params.to_h) if Rails.env.development?
+      end
+    end
+
+    def render_error content
+      #Don't actually put an error status code, or Discord will eat our error message
+      render json: { type: 4, data: { content: content, flags: (1 << 6) } }
     end
 
     def verify_discord_request
