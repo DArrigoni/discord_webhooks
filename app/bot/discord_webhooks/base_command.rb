@@ -64,17 +64,19 @@ module DiscordWebhooks
       @options_by_name ||= Array(command_params[:data][:options]).inject(Hash.new({})) do |hash, option_hash|
         if option_hash[:type] == APPLICATION_COMMAND_OPTION_TYPE[:user]
           user_id = option_hash[:value]
-          resolved_hash = {
-            resolved: {
-              member: command_params.dig(:data, :resolved, :members, user_id),
-              user: command_params.dig(:data, :resolved, :users, user_id)
-            }
-          }.deep_stringify_keys
-          option_hash.merge!(resolved_hash)
+
+          user_hash = command_params.dig(:data, :resolved, :users, user_id)
+          member_hash = command_params.dig(:data, :resolved, :members, user_id).merge({ 'user' => user_hash })
+
+          option_hash.merge!({ 'resolved' => member_hash })
         end
         hash[option_hash[:name]] = option_hash
         hash
       end.with_indifferent_access
+    end
+
+    def executor
+      command_params['member']
     end
   end
 end

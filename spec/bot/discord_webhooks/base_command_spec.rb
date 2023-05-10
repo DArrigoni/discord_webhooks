@@ -26,16 +26,16 @@ RSpec.describe DiscordWebhooks::BaseCommand do
   end
 
   context ".option & options_by_name" do
-    it 'should let me set an user option' do
+    it 'should let me set an user option and resolve when selected' do
       class FooBarCommand < DiscordWebhooks::BaseCommand
-        option 'Attacker', :user, description: 'Attacker (Default: you)'
+        option 'Attacker', :user, description: 'Attacker'
       end
 
       expect(FooBarCommand.options).to eq [
         {
           type: 6,
           name: 'attacker',
-          description: 'Attacker (Default: you)'
+          description: 'Attacker'
         }
       ]
 
@@ -77,19 +77,20 @@ RSpec.describe DiscordWebhooks::BaseCommand do
         "type" => 2
       }.with_indifferent_access)
 
-      expect(command.options_by_name[:attacker]).to eq(Hash['name' => 'attacker', 'type' => 6, 'value' => "240601403511406592",
-        'resolved' => Hash[
-          'member' => {
-            "avatar" => nil,
-            "communication_disabled_until" => nil,
-            "flags" => 0,
-            "joined_at" => "2022-01-30T02:59:08.578000+00:00",
-            "nick" => nil,
-            "pending" => false,
-            "permissions" => "137411140505153",
-            "premium_since" => nil,
-            "roles" => []
-          },
+      expect(command.options_by_name[:attacker]).to eq({
+        'name' => 'attacker',
+        'type' => 6,
+        'value' => "240601403511406592",
+        'resolved' => {
+          "avatar" => nil,
+          "communication_disabled_until" => nil,
+          "flags" => 0,
+          "joined_at" => "2022-01-30T02:59:08.578000+00:00",
+          "nick" => nil,
+          "pending" => false,
+          "permissions" => "137411140505153",
+          "premium_since" => nil,
+          "roles" => [],
           'user' => {
             "avatar" => "a_91c143c0430a778954e032d2852c0938",
             "avatar_decoration" => "v2_a_8f4e2c88d0b00a2e6eefdbe0a70944ec",
@@ -100,8 +101,86 @@ RSpec.describe DiscordWebhooks::BaseCommand do
             "public_flags" => 0,
             "username" => "H."
           }
-        ].with_indifferent_access
-      ])
+        }
+      })
+
+      Object.send(:remove_const, :FooBarCommand)
+    end
+  end
+
+  context '#executor' do
+    it 'should give me the calling user/member hash' do
+      class FooBarCommand < DiscordWebhooks::BaseCommand
+      end
+
+      command = FooBarCommand.new({
+        "data" => {
+          "guild_id" => "937179437353549855",
+          "id" => "1105837992423206912",
+          "name" => "foo-bar",
+          "type" => 1
+        },
+        "member" => {
+          "avatar" => nil,
+          "communication_disabled_until" => nil,
+          "deaf" => false,
+          "flags" => 0,
+          "joined_at" => "2022-01-30T02:56:29.828000+00:00",
+          "mute" => false,
+          "nick" => nil,
+          "pending" => false,
+          "permissions" => "140737488355327",
+          "premium_since" => nil,
+          "roles" => [
+            "952362590867181568",
+            "952362154974130196",
+            "952362628028727316",
+            "952362690003734588",
+            "952362756961603614"
+          ],
+          "user" => {
+            "avatar" => "bc85018fda99856c8343095c6908085a",
+            "avatar_decoration" => nil,
+            "discriminator" => "4375",
+            "display_name" => nil,
+            "global_name" => nil,
+            "id" => "65208420147400704",
+            "public_flags" => 0,
+            "username" => "StormTAG"
+          }
+        },
+        "type" => 2
+      })
+
+      expect(command.executor).to eq({
+        "avatar" => nil,
+        "communication_disabled_until" => nil,
+        "deaf" => false,
+        "flags" => 0,
+        "joined_at" => "2022-01-30T02:56:29.828000+00:00",
+        "mute" => false,
+        "nick" => nil,
+        "pending" => false,
+        "permissions" => "140737488355327",
+        "premium_since" => nil,
+        "roles" => [
+          "952362590867181568",
+          "952362154974130196",
+          "952362628028727316",
+          "952362690003734588",
+          "952362756961603614"
+        ],
+        "user" => {
+          "avatar" => "bc85018fda99856c8343095c6908085a",
+          "avatar_decoration" => nil,
+          "discriminator" => "4375",
+          "display_name" => nil,
+          "global_name" => nil,
+          "id" => "65208420147400704",
+          "public_flags" => 0,
+          "username" => "StormTAG"
+        }
+      })
 
       Object.send(:remove_const, :FooBarCommand)
     end
