@@ -12,16 +12,14 @@ module DiscordWebhooks
     end
 
     def self.generate_discord_command
+      return unless self.command_name.present?
+
       command_hash = {
         name: self.command_name,
         description: self.description
       }
       command_hash[:options] = options if options.present?
       command_hash
-    end
-
-    def self.inherited(subclass)
-      subclass.command
     end
 
     APPLICATION_COMMAND_OPTION_TYPE = {
