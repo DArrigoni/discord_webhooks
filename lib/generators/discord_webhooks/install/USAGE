@@ -1,0 +1,10 @@
+Description:
+    Install DiscordWebhooks
+
+Example:
+    bin/rails generate discord_webhooks:install
+
+    This will create:
+        config/initializers/discord_webhooks.rb
+
+    This will mount discord_webhooks at "/bot"

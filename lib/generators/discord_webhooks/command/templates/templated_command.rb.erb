@@ -1,0 +1,10 @@
+class <%= name.capitalize %>Command < ApplicationCommand
+  command
+
+  def run_command
+    {
+      type: 4,
+      data: { content: "Hello world!" }
+    }
+  end
+end

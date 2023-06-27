@@ -12,6 +12,7 @@ gem "sprockets-rails"
 
 group :test do
   gem "rspec-rails"
+  gem "generator_spec"
   gem "timecop"
 end
 

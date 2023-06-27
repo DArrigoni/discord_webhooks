@@ -88,6 +88,9 @@ GEM
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
     faraday-net_http (3.0.2)
+    generator_spec (0.9.4)
+      activesupport (>= 3.0.0)
+      railties (>= 3.0.0)
     globalid (1.1.0)
       activesupport (>= 5.0)
     i18n (1.13.0)
@@ -196,6 +199,7 @@ DEPENDENCIES
   discord_webhooks!
   ed25519
   faraday
+  generator_spec
   rspec-rails
   sprockets-rails
   sqlite3
